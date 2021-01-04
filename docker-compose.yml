@@ -1,0 +1,54 @@
+version: '3'
+
+services:
+  php:
+    build:
+      context: docker
+      dockerfile: php.docker
+    user: 1000:1000
+    volumes:
+      - .:/app
+      - composer:/composer
+    depends_on:
+      - db
+
+  nginx:
+    build:
+      context: docker
+      dockerfile: nginx.docker
+    volumes:
+      - .:/app
+    ports:
+      - 8080:80
+    depends_on:
+      - php
+
+  db:
+    image: mariadb:10
+    volumes:
+      - db:/var/lib/mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: $DB_PASSWORD
+      MYSQL_USER: $DB_USERNAME
+      MYSQL_PASSWORD: $DB_PASSWORD
+      MYSQL_DATABASE: $DB_DATABASE
+    ports:
+      - 33061:3306
+
+  test-db:
+    image: mariadb:10
+    volumes:
+      - type: tmpfs
+        target: /var/lib/mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: $DB_PASSWORD
+      MYSQL_USER: $DB_USERNAME
+      MYSQL_PASSWORD: $DB_PASSWORD
+      MYSQL_DATABASE: $DB_DATABASE
+    ports:
+      - 33062:3306
+
+volumes:
+  db:
+  composer:
+    name: composer
