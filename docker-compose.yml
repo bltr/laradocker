@@ -79,4 +79,5 @@ volumes:
   db:
   composer:
     name: composer
+    external: true
   redis:
